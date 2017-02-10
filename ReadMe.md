@@ -1,0 +1,1 @@
+Devides file into equal blocks and evaluates SHA-256 hash for each block
