@@ -6,13 +6,21 @@ namespace fileSignature
     public static class FileStreamer
     {
         static FileStream _file;
-        public static int blockSize;
         static int _blockIndex = 0;
+        public static int blockSize;
 
         public static void Init(int size, string path)
         {
             _file = new FileStream(path, FileMode.Open);
             blockSize = size;
+        }
+
+        public static void Close()
+        {
+            lock (_file)
+            {
+                _file.Close();
+            }
         }
 
         public static BlockInfo GetNextBlock(BlockInfo block = null)

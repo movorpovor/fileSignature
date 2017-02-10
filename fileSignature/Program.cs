@@ -9,16 +9,16 @@ namespace fileSignature
     {
         static void Main(string[] args)
         {
-            string _path;
-            int _size;
+            string path;
+            int size;
 
             try
             {
                 Console.TreatControlCAsInput = false;
                 
-                handleParametrs(args, out _path, out _size);
+                HandleParametrs(args, out path, out size);
 
-                var blockPool = new BlockPool(_size, _path);
+                var blockPool = new BlockPool(size, path);
             
                 var pool = new ThreadPool();
                 pool.ThreadsCompleted += Pool_ThreadsCompleted;
@@ -41,7 +41,7 @@ namespace fileSignature
             Console.ReadLine();
         }
 
-        static void handleParametrs(string[] args, out string path, out int size)
+        static void HandleParametrs(string[] args, out string path, out int size)
         {
             if (args.Length < 2)
             {

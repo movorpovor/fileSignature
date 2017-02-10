@@ -11,13 +11,19 @@ namespace fileSignature
         bool _isOver = true;
         Queue<BlockInfo> _poolClear;
         Queue<BlockInfo> _poolWithBlocks;
-        int _capacity = Environment.ProcessorCount * 2;
+        int _capacity = Environment.ProcessorCount * 4;
         public string fileName;
+        public bool manualStop = false;
 
         public BlockPool(int size, string path)
         {
             fileName = path;
             FileStreamer.Init(size, path);
+        }
+
+        public void Close()
+        {
+            FileStreamer.Close();
         }
 
         public void Start()
@@ -30,9 +36,10 @@ namespace fileSignature
                 for (int i = 0; i < _capacity; i++)
                     _poolClear.Enqueue(new BlockInfo(FileStreamer.blockSize));
 
-                readBlocks();
+                ReadBlocks();
 
-                _isOver = true;
+                lock(this)
+                    _isOver = true;
             }
             catch (Exception exc)
             {
@@ -41,12 +48,15 @@ namespace fileSignature
             }
         }
 
-        private void readBlocks()
+        private void ReadBlocks()
         {
             BlockInfo block;
 
-            while ((block = FileStreamer.GetNextBlock(getNextInClearQueue())) != null)
+            while ((block = FileStreamer.GetNextBlock(GetNextInClearQueue())) != null)
             {
+                if (manualStop)
+                    return;
+
                 lock (_poolWithBlocks)
                 {
                     _poolWithBlocks.Enqueue(block);
@@ -55,7 +65,7 @@ namespace fileSignature
             }
         }
 
-        private BlockInfo getNextInClearQueue()
+        private BlockInfo GetNextInClearQueue()
         {          
             lock(_poolClear)
             {
@@ -86,7 +96,7 @@ namespace fileSignature
             }
         }
 
-        public void returnBlock(BlockInfo block)
+        public void ReturnBlock(BlockInfo block)
         {
             block.bytes = new byte[FileStreamer.blockSize];
             block.index = 0;
