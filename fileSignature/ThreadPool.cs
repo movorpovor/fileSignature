@@ -35,11 +35,6 @@ namespace fileSignature
             }
 
             _blockPool.Close();
-
-            /*ThreadsCompleted?.Invoke(this, new ThreadsCompletedEventArgs
-            {
-                isBreaked = true
-            });*/
         }
 
         private void HashIt()
